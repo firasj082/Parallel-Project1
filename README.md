@@ -1,57 +1,90 @@
-````bash
-# README.md for Merge Sort Project
-# ------------------------------
+# Merge Sort Comparison
 
-## 1. Clone the repository
+This repository contains two implementations of Merge Sort in C/C++ (or your language of choice):
+
+* **Sequential Merge Sort**
+* **Parallel Merge Sort** (multi-threaded)
+
+Both implementations include a built-in validation function (`check_sort`) and a loop for computing average runtimes over multiple runs.
+
+---
+
+## Contents
+
+* [`sequential/`](#sequential)
+* [`parallel/`](#parallel)
+* [Validation (`check_sort`)](#validation)
+  
+---
+
+## Sequential Merge Sort
+
+### Configuration
+
+* **`SIZE`**: The number of elements to sort.
+  Defined at the top of `sequential/main.c` (or `.cpp`).
+
+```c
+#define SIZE 1000000  // change this value to adjust input size
+```
+
+### Build & Run
 
 ```bash
-# clone and enter project directory
-git clone https://github.com/yourusername/project1.git
-cd project1
-````
-
-## 2. Edit input parameters
-
-Open the source files in `src/` and adjust at the top:
-
-```cpp
-#define SIZE 100        // array size
-#define PNUM 8          // number of threads (parallel.cpp only)
+cd sequential
+make                # or your build command
+i./sequential       # runs the sequential merge sort
 ```
 
-Save your changes.
+The program will:
 
-## 3. Compile the code
+1. Generate an array of `SIZE` random numbers.
+2. Sort it using the sequential merge sort.
+3. Call `check_sort` to validate the result.
+4. Print the elapsed time.
+5. Repeat `NUM_TRIALS` times (default in code) and print the average.
+
+---
+
+## Parallel Merge Sort
+
+### Configuration
+
+* **`SIZE`**: Number of elements to sort (same as sequential).
+* **`PNUM`**: Number of threads/processors to use.
+
+Defined at the top of `parallel/main.c`:
+
+```c
+#define SIZE 1000000  // input size
+#define PNUM 4        // number of threads
+```
+
+### Build & Run
 
 ```bash
-mkdir -p bin
-
-# Sequential version
-g++ -O2 -std=c++11 src/sequential.cpp -o bin/sequential
-
-# Parallel version (requires pthreads)
-g++ -O2 -std=c++11 src/parallel.cpp -pthread -o bin/parallel
+cd parallel
+make                # or your build command
+i./parallel         # runs the parallel merge sort
 ```
 
-## 4. Run the executables
+This program will:
 
-```bash
-# Single-threaded test
-./bin/sequential
+1. Generate an array of `SIZE` random numbers.
+2. Spawn `PNUM` worker threads, each sorting a sub-array.
+3. Merge the sorted sub-arrays.
+4. Validate with `check_sort`.
+5. Measure and print runtime and average over `NUM_TRIALS` runs.
 
-# Multi-threaded test
-./bin/parallel
-```
+---
 
-## 5. Push changes to GitHub
+## Validation (`check_sort`)
 
-After editing or adding files:
+Each implementation includes a function named `check_sort(arr, size)` that:
 
-```bash
-git add README.md
-git commit -m "Update README instructions"
-git push origin main
-```
+1. Verifies the array is sorted in non-decreasing order.
+2. Prints a sorted or not sorted message.
 
-```
-```
+> You do **not** need to run any extra commands—validation runs automatically after each sort.
+
+---
