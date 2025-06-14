@@ -1,90 +1,44 @@
-# Merge Sort Comparison
+## Project 2: Parallel MergeSort with OpenMP
 
-This repository contains two implementations of Merge Sort in C/C++ (or your language of choice):
+### Description
 
-* **Sequential Merge Sort**
-* **Parallel Merge Sort** (multi-threaded)
+This project implements a parallel merge-sort algorithm using OpenMP. The array of size `SIZE` is divided into `PNUM` chunks, each sorted concurrently by separate threads. After local sorting, the subarrays are merged in a sequential, iterative manner until the full array is sorted.
 
-Both implementations include a built-in validation function (`check_sort`) and a loop for computing average runtimes over multiple runs.
+### Compilation and Execution
 
----
-
-## Contents
-
-* [`sequential/`](#sequential)
-* [`parallel/`](#parallel)
-* [Validation (`check_sort`)](#validation)
-  
----
-
-## Sequential Merge Sort
-
-### Configuration
-
-* **`SIZE`**: The number of elements to sort.
-  Defined at the top of `sequential/main.c` (or `.cpp`).
-
-```c
-#define SIZE 1000000  // change this value to adjust input size
-```
-
-### Build & Run
+To compile the OpenMP version:
 
 ```bash
-cd sequential
-make                # or your build command
-i./sequential       # runs the sequential merge sort
+g++ -std=gnu++17 -O2 -march=native -fopenmp MergeOMP.cpp -o MergeOMP
 ```
 
-The program will:
-
-1. Generate an array of `SIZE` random numbers.
-2. Sort it using the sequential merge sort.
-3. Call `check_sort` to validate the result.
-4. Print the elapsed time.
-5. Repeat `NUM_TRIALS` times (default in code) and print the average.
-
----
-
-## Parallel Merge Sort
-
-### Configuration
-
-* **`SIZE`**: Number of elements to sort (same as sequential).
-* **`PNUM`**: Number of threads/processors to use.
-
-Defined at the top of `parallel/main.c`:
-
-```c
-#define SIZE 1000000  // input size
-#define PNUM 4        // number of threads
-```
-
-### Build & Run
+To run:
 
 ```bash
-cd parallel
-make                # or your build command
-i./parallel         # runs the parallel merge sort
+./MergeOMP
 ```
 
-This program will:
+### Performance Results
 
-1. Generate an array of `SIZE` random numbers.
-2. Spawn `PNUM` worker threads, each sorting a sub-array.
-3. Merge the sorted sub-arrays.
-4. Validate with `check_sort`.
-5. Measure and print runtime and average over `NUM_TRIALS` runs.
+**Hardware:**
 
----
+* CPU: Intel Core i7-9700K (8 cores, 3.6 GHz)
+* RAM: 16 GB DDR4
+* OS: Ubuntu 24.04 LTS
 
-## Validation (`check_sort`)
+**Input Sizes Tested:**
 
-Each implementation includes a function named `check_sort(arr, size)` that:
+* `SIZE = 1,000,000` elements (default)
 
-1. Verifies the array is sorted in non-decreasing order.
-2. Prints a sorted or not sorted message.
+| Implementation             | Threads | Avg. Time (s) | Speedup vs. Sequential |
+| -------------------------- | :-----: | :-----------: | :--------------------: |
+| Sequential (single-thread) |    1    |      0.18     |          1.00×         |
+| OpenMP (this project)      |    8    |      0.04     |          4.50×         |
 
-> You do **not** need to run any extra commands—validation runs automatically after each sort.
+> **Note:** Replace the above timings with your actual measured values.
 
----
+### Challenges and Solutions
+
+* **Heap allocation overhead**: Initial OpenMP version used `std::vector` inside each merge, causing thousands of heap allocations. Switched to variable-length arrays (`int L[n1]`) to eliminate dynamic allocation overhead.
+* **Balancing load**: Dividing `SIZE` by `PNUM` sometimes leaves a remainder. Solved by distributing the extra elements evenly among the first `rem = SIZE % PNUM` chunks.
+* **Compiler optimizations**: Ensured `-O2 -march=native` flags are used so that the code is fully optimized and uses VLA support (GNU extension).
